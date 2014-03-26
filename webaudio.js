@@ -31,7 +31,8 @@ function LibCodingSoVisualizer() {
         var drawContext = this.canvas.getContext('2d');
 
         var times = new Uint8Array(this.analyser.frequencyBinCount);
-        this.analyser.getByteTimeDomainData(times);
+        // this.analyser.getByteTimeDomainData(times);
+        this.analyser.getByteFrequencyData(times);
         for (var i = 0; i < times.length; i++) {
             var value = times[i];
             var percent = value / 256;
@@ -39,7 +40,7 @@ function LibCodingSoVisualizer() {
             var offset = HEIGHT - height - 1;
             var barWidth = WIDTH/times.length;
             drawContext.fillStyle = 'white';
-            drawContext.fillRect(i * barWidth, offset, 1, 1);
+            drawContext.fillRect(i * barWidth, offset, 2, 2);
         }
 
         window.requestAnimationFrame(this.visualize.bind(this));
@@ -56,4 +57,3 @@ function LibCodingSoVisualizer() {
 
     this.canvas = document.getElementById('vis');
 }
-
