@@ -59,34 +59,42 @@ function LibCodingSoVisualizer() {
     this.onStreamError = function(e) {
         console.error('Error getting mic', e);
     };
+    this.timeArray = [];
 
     this.visualize = function() {
+        var LINE_NUM = 16;
+
         var color = this.color;
         var times = new Uint8Array(this.analyser.frequencyBinCount);
         // this.analyser.getByteTimeDomainData(times);
         this.analyser.getByteFrequencyData(times);
 
         // UInt8Array -> JavaScript array
-        // var timeArray = [];
-        // for(var i = 0; i < times.length; i++){
-        //     timeArray.push(times[i]);
-        // }
+        for(var i = 0; i < times.length; i++){
+            var idx = parseInt(i / (times.length/LINE_NUM));
+            if(typeof(this.timeArray[idx]) === 'undefined'){
+                this.timeArray[idx] = 0;
+            }
+            this.timeArray[ idx ] += parseInt(times[i]);
+            // this.timeArray.push(times[i]);
+        }
+        console.log(this.timeArray);
 
-        var rect = this.rect.data(times);
-
-        var width = this.constant.WIDTH / times.length;
+        var width = this.constant.WIDTH / LINE_NUM;
         var height = this.constant.HEIGHT;
+
+        var rect = this.rect.data(this.timeArray);
+
         rect.enter().append('rect')
             .attr('x', function(d,i){ return width * i })
             .attr('y', 0)
             .attr('width', width)
-            .attr('height', height);
+            .attr('height', height)
+            .style('fill', function(d) { 
+                return color(d);
+            });
 
         rect.exit().remove();
-
-        rect.style('fill', function(d) { 
-            return color(d);
-        });
 
         window.requestAnimationFrame(this.visualize.bind(this));
     };
