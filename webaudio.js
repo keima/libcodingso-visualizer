@@ -40,20 +40,19 @@ function LibCodingSoVisualizer() {
 
         var color = d3.scale.linear()
             .domain([0, 150])
-            .range(["white", "steelblue"])
+            .range(["#FFFFFF", "#0000FF"])
             .interpolate(d3.interpolateLab);
 
         var svg = d3.select("body").append("svg")
             .attr("width",  this.constant.WIDTH)
             .attr("height", this.constant.HEIGHT);
 
-        var hexagon = svg.append('g')
-            .attr('class', 'hexagons')
-            .selectAll('path');
+        var rect = svg.append('g')
+            .selectAll('rect');
 
         this.color = color;
         this.hexbin = hexbin;
-        this.hexagon = hexagon;
+        this.rect = rect;
 
         window.requestAnimationFrame(this.visualize.bind(this));
     };
@@ -62,34 +61,31 @@ function LibCodingSoVisualizer() {
     };
 
     this.visualize = function() {
-        // this.canvas.width = this.constant.WIDTH;
-        // this.canvas.height = this.constant.HEIGHT;
-        // var drawContext = this.canvas.getContext('2d');
         var color = this.color;
         var times = new Uint8Array(this.analyser.frequencyBinCount);
         // this.analyser.getByteTimeDomainData(times);
         this.analyser.getByteFrequencyData(times);
 
         // UInt8Array -> JavaScript array
-        var timeArray = [];
-        for(var i = 0; i < times.length; i++){
-            timeArray.push([i, times[i]]);
-        }
+        // var timeArray = [];
+        // for(var i = 0; i < times.length; i++){
+        //     timeArray.push(times[i]);
+        // }
 
-        var hexagon = this.hexagon.data(this.hexbin(timeArray), function(d){
-            if(typeof(d) === 'undefined') return '0,0'
-            return d.i + ',' + d.j;
-        });
+        var rect = this.rect.data(times);
 
-        hexagon.enter().append('path')
-            .attr('d', this.hexbin.hexagon(19.5))
-            .attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; });
+        var width = this.constant.WIDTH / times.length;
+        var height = this.constant.HEIGHT;
+        rect.enter().append('rect')
+            .attr('x', function(d,i){ return width * i })
+            .attr('y', 0)
+            .attr('width', width)
+            .attr('height', height);
 
-        hexagon.exit().remove();
+        rect.exit().remove();
 
-        hexagon.style('fill', function(d) { 
-            if(typeof(d) === 'undefined') return '#000000';
-            return color(d.length);
+        rect.style('fill', function(d) { 
+            return color(d);
         });
 
         window.requestAnimationFrame(this.visualize.bind(this));
