@@ -1,3 +1,9 @@
 body {
-	background: #000000;
+	background: #FFFFFF;
+}
+
+.hexagon {
+  fill: none;
+  stroke: #000;
+  stroke-width: .5px;
 }

@@ -1,6 +1,11 @@
 var context = new window.AudioContext();
 
 function LibCodingSoVisualizer() {
+    this.constant = {
+        WIDTH: 640,
+        HEIGHT:480
+    };
+
     this.setFilter = function(filter) {
         /* @see http://www.g200kg.com/jp/docs/webaudio/filter.html */
         // フィルタのタイプ
@@ -29,33 +34,63 @@ function LibCodingSoVisualizer() {
         // fftSize: 高速フーリエ変換値(2乗値が帰る)
         console.log(analyser.fftSize);
 
-        window.requestAnimationFrame(sample.visualize.bind(sample));
+        var hexbin = d3.hexbin()
+            .size([this.constant.WIDTH, this.constant.HEIGHT])
+            .radius(20);
+
+        var color = d3.scale.linear()
+            .domain([0, 150])
+            .range(["white", "steelblue"])
+            .interpolate(d3.interpolateLab);
+
+        var svg = d3.select("body").append("svg")
+            .attr("width",  this.constant.WIDTH)
+            .attr("height", this.constant.HEIGHT);
+
+        var hexagon = svg.append('g')
+            .attr('class', 'hexagons')
+            .selectAll('path');
+
+        this.color = color;
+        this.hexbin = hexbin;
+        this.hexagon = hexagon;
+
+        window.requestAnimationFrame(this.visualize.bind(this));
     };
     this.onStreamError = function(e) {
         console.error('Error getting mic', e);
     };
 
     this.visualize = function() {
-        var WIDTH = 640;
-        var HEIGHT = 480;
-
-        this.canvas.width = WIDTH;
-        this.canvas.height = HEIGHT;
-        var drawContext = this.canvas.getContext('2d');
-
+        // this.canvas.width = this.constant.WIDTH;
+        // this.canvas.height = this.constant.HEIGHT;
+        // var drawContext = this.canvas.getContext('2d');
+        var color = this.color;
         var times = new Uint8Array(this.analyser.frequencyBinCount);
         // this.analyser.getByteTimeDomainData(times);
         this.analyser.getByteFrequencyData(times);
 
-        for (var i = 0; i < times.length; i++) {
-            var value = times[i];
-            var percent = value / 256;
-            var height = HEIGHT * percent;
-            var offset = HEIGHT - height - 1;
-            var barWidth = WIDTH/times.length;
-            drawContext.fillStyle = 'white';
-            drawContext.fillRect(i * barWidth, offset, 2, 2);
+        // UInt8Array -> JavaScript array
+        var timeArray = [];
+        for(var i = 0; i < times.length; i++){
+            timeArray.push([i, times[i]]);
         }
+
+        var hexagon = this.hexagon.data(this.hexbin(timeArray), function(d){
+            if(typeof(d) === 'undefined') return '0,0'
+            return d.i + ',' + d.j;
+        });
+
+        hexagon.enter().append('path')
+            .attr('d', this.hexbin.hexagon(19.5))
+            .attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; });
+
+        hexagon.exit().remove();
+
+        hexagon.style('fill', function(d) { 
+            if(typeof(d) === 'undefined') return '#000000';
+            return color(d.length);
+        });
 
         window.requestAnimationFrame(this.visualize.bind(this));
     };

@@ -2,15 +2,15 @@
 <html>
 <head>
 <meta charset="UTF-8" />
-
 <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
 
-<canvas id='vis'></canvas>
+<!-- <canvas id='vis'></canvas> -->
+<!-- <button onclick="sample.setFilter(sample.filter)">ResetFilter</button> -->
 
-<button onclick="sample.setFilter(sample.filter)">ResetFilter</button>
-
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/d3.hexbin.v0.min.js"></script>
 <script type="text/javascript" src="webaudio.js"></script>
 <script>
 	var sample = new LibCodingSoVisualizer();
