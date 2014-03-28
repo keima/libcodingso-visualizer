@@ -39,7 +39,7 @@ function LibCodingSoVisualizer() {
             .radius(20);
 
         var color = d3.scale.linear()
-            .domain([0, 150])
+            .domain([0, 10000])
             .range(["#FFFFFF", "#0000FF"])
             .interpolate(d3.interpolateLab);
 
@@ -47,9 +47,9 @@ function LibCodingSoVisualizer() {
             .attr("width",  this.constant.WIDTH)
             .attr("height", this.constant.HEIGHT);
 
-        var rect = svg.append('g')
-            .selectAll('rect');
+        var rect = svg.append('g');
 
+        this.svg = svg;
         this.color = color;
         this.hexbin = hexbin;
         this.rect = rect;
@@ -70,6 +70,7 @@ function LibCodingSoVisualizer() {
         this.analyser.getByteFrequencyData(times);
 
         // UInt8Array -> JavaScript array
+        this.timeArray = [];
         for(var i = 0; i < times.length; i++){
             var idx = parseInt(i / (times.length/LINE_NUM));
             if(typeof(this.timeArray[idx]) === 'undefined'){
@@ -78,14 +79,17 @@ function LibCodingSoVisualizer() {
             this.timeArray[ idx ] += parseInt(times[i]);
             // this.timeArray.push(times[i]);
         }
-        console.log(this.timeArray);
 
         var width = this.constant.WIDTH / LINE_NUM;
         var height = this.constant.HEIGHT;
 
-        var rect = this.rect.data(this.timeArray);
+        var rect = this.rect.selectAll('rect').data(this.timeArray); 
 
-        rect.enter().append('rect')
+        rect.exit().remove();
+
+        rect.enter().append('rect');
+        
+        this.rect.selectAll('rect')
             .attr('x', function(d,i){ return width * i })
             .attr('y', 0)
             .attr('width', width)
@@ -94,7 +98,6 @@ function LibCodingSoVisualizer() {
                 return color(d);
             });
 
-        rect.exit().remove();
 
         window.requestAnimationFrame(this.visualize.bind(this));
     };
