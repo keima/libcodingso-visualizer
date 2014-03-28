@@ -2,8 +2,8 @@ var context = new window.AudioContext();
 
 function LibCodingSoVisualizer() {
     this.constant = {
-        WIDTH: 640,
-        HEIGHT:480
+        WIDTH:  (window.innerWidth < 300) ? 640 : window.innerWidth,
+        HEIGHT: (window.innerHeight < 300) ? 480 : window.innerHeight
     };
 
     this.setFilter = function(filter) {
@@ -39,7 +39,7 @@ function LibCodingSoVisualizer() {
             .radius(20);
 
         var color = d3.scale.linear()
-            .domain([0, 10000])
+            .domain([0, 20000])
             .range(["#FFFFFF", "#0000FF"])
             .interpolate(d3.interpolateLab);
 
