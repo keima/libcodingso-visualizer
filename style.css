@@ -12,3 +12,9 @@ body {
   stroke: #000;
   stroke-width: .5px;
 }
+
+img {
+    position: fixed;
+    top: 300px;
+    left: 300px;
+}
