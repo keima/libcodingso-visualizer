@@ -6,9 +6,9 @@ function LibCodingSoVisualizer() {
         // フィルタのタイプ
         filter.type = filter.NOTCH;
         // フィルタの周波数
-        filter.frequency.value = 1000.0;
+        filter.frequency.value = 60.0;
         // フィルタのQ（適用範囲）
-        filter.Q = 100.0;
+        filter.Q = 10.0;
     }
 
     this.onStream = function(stream) {
@@ -21,10 +21,8 @@ function LibCodingSoVisualizer() {
 
         this.setFilter(filter);
 
-        // input.connect(filter);
-        // filter.connect(analyser);
-
-        input.connect(analyser);
+        input.connect(filter);
+        filter.connect(analyser);
 
         // fftSize: 高速フーリエ変換値(2乗値が帰る)
         console.log(analyser.fftSize);

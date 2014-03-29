@@ -7,9 +7,36 @@
 </head>
 <body>
 
+<h1>Frequency Visualizer with WebAudio API</h1>
+
 <canvas id='vis'></canvas>
 
-<button onclick="sample.setFilter(sample.filter)">ResetFilter</button>
+<div>
+    <button onclick="sample.setFilter(sample.filter)">ResetFilter</button>
+</div>
+
+<h2>解説</h2>
+<p>
+    このVisualizerは <a href="http://libcoding.so/">Live Coding de Night</a> の「#libcodingso at 2nd Infinite」にて @pside が披露したものです。<br>
+    <a href="http://webaudioapi.com/samples/microphone/">Microphone | Web Audio API</a> を参考にしております。<br>
+    オリジナル版はモダンブラウザであれば動作するような仕組みが入ってますが、僕が作成したものはベンダー修飾子の都合、ChromeやWebkit系でのみ動作します。
+</p>
+
+<p>
+    参考元のVisualizerは、`getByteTimeDomainData()`で取得した結果を可視化しています。これはWaveformデータ、つまり波形を表示します。<br>
+    一方、僕が作成したVisualizerは`getByteFrequencyData()`を可視化しています。これは周波数です。画面左側が低周波数、右側が高周波数です。
+</p>
+
+<p>
+    OS XでSoundflowerなどを介して鳴っている音を直接入力すると、自分が聞いている音の周波数を可視化できるので楽しいです。あとMP3とかストリーミング音源とか艦これの音を可視化すると、ある程度高い周波数がほとんど観測されなくなります。音声圧縮で人間が聞き取りづらい周波数帯をカットしているためです（ただし最近の調査結果では、この周波数帯は人間でも感じ取れるとか）。
+</p>
+
+<p>
+    `resetFilter`ボタンについて、押すとwebaudio.jsの`setFilter(filter)`メソッドがコールされます。<br>
+    ChromeのDeveloper Toolsを開いて、`setFilter`メソッドのfilterの定義値を弄ったあと「Ctrl+S」すると値がソースコード上に保存されます。ただこのままだとVisualizerに反映されないので、ボタンを押すことでWebページのリロードの必要なくフィルターの値を調節できます。<br>
+    え？なんで入力欄とか用意しないのかって？めんどくさかったんですよ。。。<br>
+    詳しくは <a href="http://docs.webplatform.org/wiki/apis/webaudio/BiquadFilterNode">BiquadFilterNode · apis · WPD · WebPlatform.org</a> をご覧下さい。
+</p>
 
 <script type="text/javascript" src="webaudio.js"></script>
 <script>
